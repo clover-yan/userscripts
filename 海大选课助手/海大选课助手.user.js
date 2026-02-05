@@ -8,7 +8,7 @@
 // @icon         https://www.hainanu.edu.cn/favicon.ico
 // @grant        none
 // @run-at       document-idle
-// @license      AGPLv3
+// @license      AGPL-3.0-or-later
 // ==/UserScript==
 
 (function() {
