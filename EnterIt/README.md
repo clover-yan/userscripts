@@ -1,5 +1,9 @@
 # EnterIt
 
+[Greasy Fork](https://greasyfork.org/en/scripts/565107-enterit) | [GitHub](https://github.com/clover-yan/userscripts/tree/master/EnterIt)
+
+---
+
 A Tampermonkey user script that enables pressing Enter to insert a new line and Ctrl+Enter (⌘⏎) to send messages in input boxes on various AI assistant web platforms.
 
 The script logic is inspired by [masachika-kamada/ChatGPT-Ctrl-Enter-Sender](https://github.com/masachika-kamada/ChatGPT-Ctrl-Enter-Sender).
@@ -32,3 +36,4 @@ Platforms marked with \* have been personally tested and confirmed to work.
 - [Doubao](https://www.doubao.com) \*
 - [Qianwen](https://www.qianwen.com) (Domestic version) \*
 - [Qwen](https://chat.qwen.ai) \*
+- [Yiyan](https://yiyan.baidu.com) \*

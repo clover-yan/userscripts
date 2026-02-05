@@ -1,5 +1,9 @@
 # EnterIt
 
+[Greasy Fork](https://greasyfork.org/zh-TW/scripts/565107-enterit) | [GitHub](https://github.com/clover-yan/userscripts/tree/master/EnterIt)
+
+---
+
 這不是一段冰冷的代碼，而是為了終結那份「按下 Enter 就會失去一切」的恐懼，所譜寫的救贖樂章。
 
 這是一個 Tampermonkey 使用者腳本。當我們與 AI 相互對峙時，那些輕易被發送出去的殘缺語句，難道不就像是無法傳達的心意嗎？為了守護對話的完整性，EnterIt 選擇了改寫這份命運的劇本。
@@ -34,5 +38,6 @@
 - [豆包](https://www.doubao.com) \*
 - [千問](https://www.qianwen.com) (大陸版) \*
 - [Qwen](https://chat.qwen.ai) \*
+- [文心一言](https://yiyan.baidu.com) \*
 
 *即使世界再怎麼混亂，至少這份輸入的節奏，要由我們自己來譜寫。*

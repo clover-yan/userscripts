@@ -1,5 +1,9 @@
 # EnterIt
 
+[Greasy Fork](https://greasyfork.org/zh-CN/scripts/565107-enterit) | [GitHub](https://github.com/clover-yan/userscripts/tree/master/EnterIt)
+
+---
+
 一个 Tampermonkey 用户脚本，支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送。
 
 脚本逻辑参考自 [masachika-kamada/ChatGPT-Ctrl-Enter-Sender](https://github.com/masachika-kamada/ChatGPT-Ctrl-Enter-Sender)。
@@ -32,3 +36,4 @@
 - [豆包](https://www.doubao.com) \*
 - [千问](https://www.qianwen.com) (国内版) \*
 - [Qwen](https://chat.qwen.ai) \*
+- [文心一言](https://yiyan.baidu.com) \*

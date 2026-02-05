@@ -3,10 +3,10 @@
 // @name:zh-CN         EnterIt
 // @name:zh-TW         EnterIt
 // @namespace          http://tampermonkey.net/
-// @version            1.1.0
+// @version            1.2.0
 // @description        Support Enter for new line and Ctrl+Enter to send in various AI assistant web input boxes
 // @description:zh-CN  支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送
-// @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 為傳遞覺悟的發送。
+// @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 傳送命運的覺悟。
 // @author             Clover Yan
 // @homepage           https://www.khyan.top/
 // @match              https://chatgpt.com/*
@@ -28,6 +28,7 @@
 // @match              https://www.doubao.com/*
 // @match              https://www.qianwen.com/*
 // @match              https://chat.qwen.ai/*
+// @match              https://yiyan.baidu.com/*
 // @icon               https://www.khyan.top/favicon.png
 // @grant              none
 // @run-at             document-start
@@ -143,6 +144,12 @@
 				event.target.classList.contains("ql-editor") &&
 				event.target.contentEditable === "true"
 			);
+		} else if (url.startsWith("https://yiyan.baidu.com")) {
+			return (
+				event.target.tagName === "DIV" &&
+				event.target.getAttribute("role") === "textbox" &&
+				event.target.contentEditable === "true"
+			);
 		}
 
 		return false;
@@ -203,6 +210,10 @@
 			if (url.startsWith("https://chat.deepseek.com")) {
 				eventConfig.keyCode = 13;
 				eventConfig.composed = true;
+			}
+
+			if (url.startsWith("https://yiyan.baidu.com")) {
+				eventConfig.keyCode = 13;
 			}
 
 			const newEvent = new KeyboardEvent("keydown", eventConfig);
@@ -296,7 +307,8 @@
 			url.startsWith("https://grok.com") ||
 			url.startsWith("https://m365.cloud.microsoft") ||
 			url.startsWith("https://www.perplexity.ai") ||
-			url.startsWith("https://yuanbao.tencent.com")
+			url.startsWith("https://yuanbao.tencent.com") ||
+			url.startsWith("https://yiyan.baidu.com")
 		) {
 			if (handleCustomInputs(event)) return;
 		} else if (
