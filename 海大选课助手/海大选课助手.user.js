@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         海大选课助手
 // @namespace    http://tampermonkey.net/
-// @version      0.0.2
+// @version      0.0.3
 // @description  支持在输入框按回车键快速发起查询，并扩展课程列表显示区域高度，选课快人一步
 // @author       Clover Yan
 // @match        https://jxgl.hainanu.edu.cn/jsxsd/xsxkkc/getBxxkxx*
