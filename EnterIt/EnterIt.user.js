@@ -3,7 +3,7 @@
 // @name:zh-CN         EnterIt
 // @name:zh-TW         EnterIt
 // @namespace          http://tampermonkey.net/
-// @version            1.2.0
+// @version            1.2.1
 // @description        Support Enter for new line and Ctrl+Enter to send in various AI assistant web input boxes
 // @description:zh-CN  支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送
 // @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 傳送命運的覺悟。
@@ -37,6 +37,16 @@
 
 (function () {
 	"use strict";
+
+	function replaceAll(str, search, replace) {
+		if (typeof str.replaceAll === "function") {
+			return str.replaceAll(search, replace);
+		}
+		return str.replace(
+			new RegExp(String(search).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"),
+			replace,
+		);
+	}
 
 	function handleChatGPT(event) {
 		const isOnlyEnter =
@@ -325,44 +335,85 @@
 		}
 	}
 
-	function fixYuanbaoPlaceholder() {
-		const editor = document.querySelector('.ql-editor[contenteditable="true"]');
-		if (editor) {
-			const placeholder = editor.getAttribute("data-placeholder");
-			if (placeholder && placeholder.includes("shift+enter")) {
-				editor.setAttribute(
-					"data-placeholder",
-					placeholder.replace(/shift\+enter/gi, "Ctrl+Enter"),
-				);
+	function fixPlaceholder(placeholderConfig) {
+		const editor = document.querySelector(placeholderConfig.selector);
+		if (!editor) {
+			return;
+		}
+		const placeholder = placeholderConfig.attribute
+			? editor.getAttribute(placeholderConfig.attribute)
+			: editor.innerText;
+		if (placeholder && placeholder.includes(placeholderConfig.searchString)) {
+			const newPlaceholder = replaceAll(
+				placeholder,
+				placeholderConfig.searchString,
+				placeholderConfig.replaceString,
+			);
+			if (placeholderConfig.attribute) {
+				editor.setAttribute(placeholderConfig.attribute, newPlaceholder);
+			} else {
+				editor.innerText = newPlaceholder;
 			}
 		}
 	}
 
-	function observeYuanbaoPlaceholder() {
-		if (!window.location.href.startsWith("https://yuanbao.tencent.com")) {
-			return;
-		}
+	function observePlaceholder() {
+		const url = window.location.href;
 
-		fixYuanbaoPlaceholder();
+		const placeholderConfig = [
+			[
+				"https://yuanbao.tencent.com",
+				{
+					attribute: "data-placeholder",
+					selector: '.ql-editor[contenteditable="true"]',
+					searchString: "shift+enter换行",
+					replaceString: "Enter 换行，Ctrl+Enter 发送",
+				},
+			],
+			[
+				"https://yiyan.baidu.com",
+				{
+					attribute: null,
+					selector: 'span[data-slate-placeholder="true"]',
+					searchString: "通过shift+回车换行",
+					replaceString: "通过回车换行，Ctrl+回车发送",
+				},
+			],
+		].find(([site]) => url.startsWith(site))?.[1];
 
-		const observer = new MutationObserver(() => {
-			fixYuanbaoPlaceholder();
-		});
+		if (!placeholderConfig) return;
 
-		observer.observe(document.body, {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ["data-placeholder"],
-		});
+		let observer;
+		const setupObserver = () => {
+			if (observer) {
+				observer.disconnect();
+			}
+			observer = new MutationObserver(() => {
+				fixPlaceholder(placeholderConfig);
+			});
+
+			const observeOptions = {
+				childList: true,
+				subtree: true,
+				attributes: Boolean(placeholderConfig.attribute),
+				characterData: !placeholderConfig.attribute,
+			};
+			if (placeholderConfig.attribute) {
+				observeOptions.attributeFilter = [placeholderConfig.attribute];
+			}
+			observer.observe(document.body, observeOptions);
+		};
+
+		fixPlaceholder(placeholderConfig);
+		setupObserver();
 	}
 
 	document.addEventListener("keydown", handleKeyDown, { capture: true });
 
 	if (document.readyState === "loading") {
-		document.addEventListener("DOMContentLoaded", observeYuanbaoPlaceholder);
+		document.addEventListener("DOMContentLoaded", observePlaceholder);
 	} else {
-		observeYuanbaoPlaceholder();
+		observePlaceholder();
 	}
 
 	console.log("✅ EnterIt 已加载");
