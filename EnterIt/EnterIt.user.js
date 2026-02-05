@@ -32,7 +32,7 @@
 // @icon               https://www.khyan.top/favicon.png
 // @grant              none
 // @run-at             document-start
-// @license            AGPLv3
+// @license            AGPL-3.0-or-later
 // ==/UserScript==
 
 (function () {
