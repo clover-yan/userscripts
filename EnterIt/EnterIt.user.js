@@ -3,7 +3,7 @@
 // @name:zh-CN         EnterIt
 // @name:zh-TW         EnterIt
 // @namespace          http://tampermonkey.net/
-// @version            1.2.1
+// @version            1.2.2
 // @description        Support Enter for new line and Ctrl+Enter to send in various AI assistant web input boxes
 // @description:zh-CN  支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送
 // @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 傳送命運的覺悟。
@@ -50,8 +50,8 @@
 
 	function handleChatGPT(event) {
 		const isOnlyEnter =
-			event.code === "Enter" && !(event.ctrlKey || event.metaKey);
-		const isCtrlEnter = event.code === "Enter" && event.ctrlKey;
+			event.key === "Enter" && !(event.ctrlKey || event.metaKey);
+		const isCtrlEnter = event.key === "Enter" && event.ctrlKey;
 		const isPromptTextarea = event.target.id === "prompt-textarea";
 
 		if (!event.isTrusted) return false;
@@ -118,7 +118,7 @@
 					event.target.classList.contains("ql-editor") &&
 					event.target.contentEditable === "true") ||
 					event.target.tagName === "TEXTAREA") &&
-				!(event.shiftKey && event.code === "Enter")
+				!(event.shiftKey && event.key === "Enter")
 			);
 		} else if (url.startsWith("https://www.phind.com")) {
 			return (
@@ -185,9 +185,9 @@
 		}
 
 		const isOnlyEnter =
-			event.code === "Enter" && !(event.ctrlKey || event.metaKey);
+			event.key === "Enter" && !(event.ctrlKey || event.metaKey);
 		const isCtrlEnter =
-			event.code === "Enter" && (event.ctrlKey || event.metaKey);
+			event.key === "Enter" && (event.ctrlKey || event.metaKey);
 
 		if (isOnlyEnter || isCtrlEnter) {
 			const preventDefaultSites = [
@@ -269,14 +269,14 @@
 		}
 
 		const isOnlyEnter =
-			event.code === "Enter" && !(event.ctrlKey || event.metaKey);
+			event.key === "Enter" && !(event.ctrlKey || event.metaKey);
 
 		if (isOnlyEnter) {
 			event.stopPropagation();
 			return true;
 		} else {
 			const isCtrlEnter =
-				event.code === "Enter" && (event.ctrlKey || event.metaKey);
+				event.key === "Enter" && (event.ctrlKey || event.metaKey);
 			if (isCtrlEnter) {
 				const preventCtrlEnterSites = ["https://www.qianwen.com"];
 				if (
