@@ -3,7 +3,7 @@
 // @name:zh-CN         EnterIt
 // @name:zh-TW         EnterIt
 // @namespace          http://tampermonkey.net/
-// @version            1.2.2
+// @version            1.2.3
 // @description        Support Enter for new line and Ctrl+Enter to send in various AI assistant web input boxes
 // @description:zh-CN  支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送
 // @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 傳送命運的覺悟。
@@ -11,6 +11,7 @@
 // @homepage           https://www.khyan.top/
 // @match              https://chatgpt.com/*
 // @match              https://claude.ai/*
+// @match              https://www.google.com/*
 // @match              https://gemini.google.com/*
 // @match              https://www.perplexity.ai/*
 // @match              https://chat.deepseek.com/*
@@ -99,7 +100,7 @@
 		return false;
 	}
 
-	function shouldHandleCtrlEnter(url, event) {
+	function shouldHandleCtrlEnter(url, search, event) {
 		if (url.startsWith("https://claude.ai")) {
 			return (
 				(event.target.tagName === "DIV" &&
@@ -111,6 +112,8 @@
 				event.target.tagName === "TEXTAREA" &&
 				event.target.classList.contains("query-box-input")
 			);
+		} else if (url.startsWith("https://www.google.com")) {
+			return event.target.tagName === "TEXTAREA";
 		} else if (url.startsWith("https://gemini.google.com")) {
 			return (
 				((event.target.tagName === "DIV" &&
@@ -168,12 +171,13 @@
 
 	function handleCustomInputs(event) {
 		const url = window.location.href;
+		const search = window.location.search;
 
 		if (event.isComposing) {
 			return false;
 		}
 
-		if (!shouldHandleCtrlEnter(url, event) || !event.isTrusted) {
+		if (!shouldHandleCtrlEnter(url, search, event) || !event.isTrusted) {
 			return false;
 		}
 
@@ -314,6 +318,8 @@
 		) {
 			if (handleCustomInputs(event)) return;
 		} else if (
+			(url.startsWith("https://www.google.com") &&
+				new URLSearchParams(search).get("udm") === "50") ||
 			url.startsWith("https://poe.com") ||
 			url.startsWith("https://chat.mistral.ai") ||
 			url.startsWith("https://you.com") ||

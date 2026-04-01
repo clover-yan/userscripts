@@ -19,6 +19,7 @@
 
 - [ChatGPT](https://chatgpt.com) \*
 - [Claude](https://claude.ai)
+- [Google AI 模式](https://www.google.com?udm=50) \*
 - [Gemini](https://gemini.google.com) \*
 - [Perplexity](https://www.perplexity.ai)
 - [DeepSeek](https://chat.deepseek.com) \*
