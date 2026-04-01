@@ -22,7 +22,7 @@
 - [Gemini](https://gemini.google.com) \*
 - [Perplexity](https://www.perplexity.ai)
 - [DeepSeek](https://chat.deepseek.com) \*
-- [Grok](https://grok.com) \*
+- ~~[Grok](https://grok.com) \*~~ — 不再支持：Grok 设置里已经提供了该功能
 - [GitHub Copilot](https://github.com/copilot) \*
 - [NotebookLM](https://notebooklm.google.com) \*
 - [Phind](https://www.phind.com)

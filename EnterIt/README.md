@@ -22,7 +22,7 @@ Platforms marked with \* have been personally tested and confirmed to work.
 - [Gemini](https://gemini.google.com) \*
 - [Perplexity](https://www.perplexity.ai)
 - [DeepSeek](https://chat.deepseek.com) \*
-- [Grok](https://grok.com) \*
+- ~~[Grok](https://grok.com) \*~~ — Support dropped: Already available in Grok Settings
 - [GitHub Copilot](https://github.com/copilot) \*
 - [NotebookLM](https://notebooklm.google.com) \*
 - [Phind](https://www.phind.com)

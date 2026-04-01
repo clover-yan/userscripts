@@ -14,7 +14,6 @@
 // @match              https://gemini.google.com/*
 // @match              https://www.perplexity.ai/*
 // @match              https://chat.deepseek.com/*
-// @match              https://grok.com/*
 // @match              https://github.com/*
 // @match              https://notebooklm.google.com/*
 // @match              https://www.phind.com/*
@@ -128,12 +127,6 @@
 			);
 		} else if (url.startsWith("https://chat.deepseek.com")) {
 			return event.target.tagName === "TEXTAREA";
-		} else if (url.startsWith("https://grok.com")) {
-			return (
-				event.target.tagName === "TEXTAREA" ||
-				(event.target.tagName === "DIV" &&
-					event.target.contentEditable === "true")
-			);
 		} else if (url.startsWith("https://github.com")) {
 			return (
 				event.target.getAttribute("placeholder") === "Ask Copilot" ||
@@ -314,7 +307,6 @@
 			url.startsWith("https://www.phind.com") ||
 			url.startsWith("https://chat.deepseek.com") ||
 			url.startsWith("https://github.com") ||
-			url.startsWith("https://grok.com") ||
 			url.startsWith("https://m365.cloud.microsoft") ||
 			url.startsWith("https://www.perplexity.ai") ||
 			url.startsWith("https://yuanbao.tencent.com") ||
