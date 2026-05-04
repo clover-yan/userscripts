@@ -3,7 +3,7 @@
 // @name:zh-CN         EnterIt
 // @name:zh-TW         EnterIt
 // @namespace          http://tampermonkey.net/
-// @version            1.2.3
+// @version            1.2.4
 // @description        Support Enter for new line and Ctrl+Enter to send in various AI assistant web input boxes
 // @description:zh-CN  支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送
 // @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 傳送命運的覺悟。
@@ -148,6 +148,12 @@
 			return (
 				event.target.tagName === "DIV" &&
 				event.target.classList.contains("ql-editor") &&
+				event.target.contentEditable === "true"
+			);
+		} else if (url.startsWith("https://www.qianwen.com")) {
+			return (
+				event.target.tagName === "DIV" &&
+				event.target.getAttribute("role") === "textbox" &&
 				event.target.contentEditable === "true"
 			);
 		} else if (url.startsWith("https://yiyan.baidu.com")) {
@@ -314,6 +320,7 @@
 			url.startsWith("https://m365.cloud.microsoft") ||
 			url.startsWith("https://www.perplexity.ai") ||
 			url.startsWith("https://yuanbao.tencent.com") ||
+			url.startsWith("https://www.qianwen.com") ||
 			url.startsWith("https://yiyan.baidu.com")
 		) {
 			if (handleCustomInputs(event)) return;
@@ -326,7 +333,6 @@
 			url.startsWith("https://v0.dev") ||
 			url.startsWith("https://copilot.microsoft.com") ||
 			url.startsWith("https://www.doubao.com") ||
-			url.startsWith("https://www.qianwen.com") ||
 			url.startsWith("https://chat.qwen.ai")
 		) {
 			if (handleTextarea(event)) return;
