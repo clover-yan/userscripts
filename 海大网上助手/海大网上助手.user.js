@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         海大网上助手
 // @namespace    http://tampermonkey.net/
-// @version      0.1.0
+// @version      0.1.1
 // @description  专为优化海大各网上系统的用户体验设计
 // @author       Clover Yan
 // @match        https://jxgl.hainanu.edu.cn/jsxsd/xsxkkc/getBxxkxx*
+// @match        https://jxgl.hainanu.edu.cn/jsxsd/xsxkkc/getXxxk*
+// @match        https://jxgl.hainanu.edu.cn/jsxsd/xsxkkc/getGgxxk*
 // @match        https://ehall.hainanu.edu.cn/CUS_TEMPLATE_OFFICIAL/pc/index.html*
 // @icon         https://www.hainanu.edu.cn/favicon.ico
 // @grant        none
@@ -18,6 +20,12 @@
 	if (
 		window.location.href.startsWith(
 			"https://jxgl.hainanu.edu.cn/jsxsd/xsxkkc/getBxxkxx",
+		) ||
+		window.location.href.startsWith(
+			"https://jxgl.hainanu.edu.cn/jsxsd/xsxkkc/getXxxk",
+		) ||
+		window.location.href.startsWith(
+			"https://jxgl.hainanu.edu.cn/jsxsd/xsxkkc/getGgxxk",
 		)
 	) {
 		// 注入 CSS 样式
