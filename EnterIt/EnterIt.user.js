@@ -48,27 +48,28 @@
 		);
 	}
 
+	// The composer rolled out to some accounts in 2026-09 has no id. Upstream
+	// (ChatGPT-Ctrl-Enter-Sender) keys off data-composer-markdown instead.
 	function isChatGPTComposer(element) {
 		if (!element) return false;
-		if (element.id === "prompt-textarea") return true;
 		return (
-			element.tagName === "DIV" &&
-			element.contentEditable === "true" &&
-			element.classList.contains("ProseMirror")
+			element.id === "prompt-textarea" ||
+			!!element.hasAttribute?.("data-composer-markdown")
 		);
 	}
 
-	function dispatchChatGPTEnter(composer, modifiers) {
-		composer.dispatchEvent(
+	function findFormButton(target, selector) {
+		const form = target.closest("form");
+		return form ? form.querySelector(selector) : null;
+	}
+
+	function dispatchEnterEvent(target, modifiers) {
+		target.dispatchEvent(
 			new KeyboardEvent("keydown", {
 				key: "Enter",
 				code: "Enter",
 				bubbles: true,
 				cancelable: true,
-				ctrlKey: false,
-				metaKey: false,
-				shiftKey: false,
-				altKey: false,
 				...modifiers,
 			}),
 		);
@@ -78,42 +79,66 @@
 		if (!event.isTrusted || event.isComposing) return false;
 		if (event.key !== "Enter") return false;
 
-		// ChatGPT's composer used to be <textarea id="prompt-textarea"> and is now
-		// a ProseMirror contenteditable div without that id, so match the editor
-		// itself instead of relying on the id.
-		const composer = isChatGPTComposer(event.target)
-			? event.target
-			: event.target.closest?.('.ProseMirror[contenteditable="true"]');
-		if (!composer) return false;
-
-		if (event.altKey) return false;
+		const target = event.target;
+		if (!isChatGPTComposer(target) && target.tagName !== "TEXTAREA") {
+			return false;
+		}
 
 		const isCtrlEnter = event.ctrlKey || event.metaKey;
-		const isShiftEnter = event.shiftKey;
 
-		// Shift+Enter already inserts a newline.
-		if (isShiftEnter && !isCtrlEnter) return false;
-
-		// ChatGPT sends on Enter and sends in the background on Ctrl+Enter, but
-		// its settings page refuses to remap them (the "send comment" shortcut
-		// also uses Ctrl+Enter). Do the remapping ourselves:
-		//   Enter              -> Shift+Enter  (newline)
-		//   Ctrl/Cmd+Enter     -> Enter        (send, switches to the chat)
-		//   Ctrl/Cmd+Shift+Enter -> Ctrl+Enter (send in background)
-		event.preventDefault();
-		event.stopImmediatePropagation();
-
-		if (isCtrlEnter && isShiftEnter) {
-			dispatchChatGPTEnter(composer, {
+		// Local addition: Ctrl/Cmd+Shift+Enter sends in the background, i.e.
+		// ChatGPT's native Ctrl+Enter behaviour.
+		if (isCtrlEnter && event.shiftKey && isChatGPTComposer(target)) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			dispatchEnterEvent(target, {
 				ctrlKey: event.ctrlKey,
 				metaKey: event.metaKey,
 			});
-		} else if (isCtrlEnter) {
-			dispatchChatGPTEnter(composer, {});
-		} else {
-			dispatchChatGPTEnter(composer, { shiftKey: true });
+			return true;
 		}
 
+		if (!isCtrlEnter) {
+			// Shift+Enter already inserts a newline.
+			if (event.shiftKey) return false;
+
+			if (isChatGPTComposer(target)) {
+				event.preventDefault();
+				dispatchEnterEvent(target, { shiftKey: true });
+				return true;
+			}
+
+			if (target.id === "mobile-composer-prompt") {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+				document.execCommand("insertLineBreak");
+				return true;
+			}
+
+			return false;
+		}
+
+		// The new composer's shortcuts are user-configurable, so click its send
+		// button instead of remapping keys. Stop and voice buttons are
+		// type="button", so this only matches an available Send.
+		if (target.hasAttribute?.("data-composer-markdown")) {
+			if (event.defaultPrevented) return false;
+			const sendButton = findFormButton(
+				target,
+				'button[type="submit"]:not([disabled])',
+			);
+			if (!sendButton) return false;
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			sendButton.click();
+			return true;
+		}
+
+		// Old composer: Mac Cmd+Enter works natively on ChatGPT; only intercept
+		// Ctrl.
+		if (!event.ctrlKey) return false;
+		event.preventDefault();
+		dispatchEnterEvent(target, { metaKey: true });
 		return true;
 	}
 
@@ -444,7 +469,13 @@
 		setupObserver();
 	}
 
-	document.addEventListener("keydown", handleKeyDown, { capture: true });
+	// ChatGPT's background-send shortcut listens on window, ahead of a
+	// document listener, so we have to listen there too to catch it first.
+	const keydownTarget =
+		window.location.hostname === "chatgpt.com" ? window : document;
+	keydownTarget.addEventListener("keydown", handleKeyDown, {
+		capture: true,
+	});
 
 	if (document.readyState === "loading") {
 		document.addEventListener("DOMContentLoaded", observePlaceholder);
