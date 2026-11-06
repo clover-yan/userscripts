@@ -298,9 +298,23 @@
 			const isCtrlEnter =
 				event.key === "Enter" && (event.ctrlKey || event.metaKey);
 			if (isCtrlEnter) {
-				const preventCtrlEnterSites = ["https://www.qianwen.com"];
+				// Google AI Mode ignores synthetic keydown events, so click its
+				// send button instead of re-dispatching Enter.
+				if (window.location.href.startsWith("https://www.google.com")) {
+					const sendButton = document.querySelector(
+						'button[data-xid="input-plate-send-button"]',
+					);
+					if (sendButton && !sendButton.disabled) {
+						event.preventDefault();
+						event.stopImmediatePropagation();
+						sendButton.click();
+						return true;
+					}
+				}
+
+				const sendCtrlEnterSites = ["https://www.qianwen.com"];
 				if (
-					preventCtrlEnterSites.some((site) =>
+					sendCtrlEnterSites.some((site) =>
 						window.location.href.startsWith(site),
 					)
 				) {
@@ -324,6 +338,7 @@
 
 	function handleKeyDown(event) {
 		const url = window.location.href;
+		const search = window.location.search;
 
 		if (url.startsWith("https://chatgpt.com")) {
 			if (handleChatGPT(event)) return;
