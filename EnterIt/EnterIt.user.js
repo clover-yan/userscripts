@@ -8,7 +8,7 @@
 // @description:zh-CN  支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送
 // @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 傳送命運的覺悟。
 // @author             Clover Yan
-// @homepage           https://www.khyan.top/
+// @homepage           https://cloveryan.com/
 // @match              https://chatgpt.com/*
 // @match              https://claude.ai/*
 // @match              https://www.google.com/*
@@ -29,7 +29,7 @@
 // @match              https://www.qianwen.com/*
 // @match              https://chat.qwen.ai/*
 // @match              https://yiyan.baidu.com/*
-// @icon               https://www.khyan.top/favicon.png
+// @icon               https://cloveryan.com/favicon.png
 // @grant              none
 // @run-at             document-start
 // @license            AGPL-3.0-or-later
@@ -48,56 +48,73 @@
 		);
 	}
 
-	function handleChatGPT(event) {
-		const isOnlyEnter =
-			event.key === "Enter" && !(event.ctrlKey || event.metaKey);
-		const isCtrlEnter = event.key === "Enter" && event.ctrlKey;
-		const isPromptTextarea = event.target.id === "prompt-textarea";
+	function isChatGPTComposer(element) {
+		if (!element) return false;
+		if (element.id === "prompt-textarea") return true;
+		return (
+			element.tagName === "DIV" &&
+			element.contentEditable === "true" &&
+			element.classList.contains("ProseMirror")
+		);
+	}
 
-		if (!event.isTrusted) return false;
-
-		if (isPromptTextarea && isOnlyEnter) {
-			event.preventDefault();
-			const newEvent = new KeyboardEvent("keydown", {
+	function dispatchChatGPTEnter(composer, modifiers) {
+		composer.dispatchEvent(
+			new KeyboardEvent("keydown", {
 				key: "Enter",
 				code: "Enter",
 				bubbles: true,
 				cancelable: true,
 				ctrlKey: false,
 				metaKey: false,
-				shiftKey: true,
-			});
-			event.target.dispatchEvent(newEvent);
-			return true;
-		} else if (isPromptTextarea && isCtrlEnter) {
-			event.preventDefault();
-			const newEvent = new KeyboardEvent("keydown", {
-				key: "Enter",
-				code: "Enter",
-				bubbles: true,
-				cancelable: true,
-				ctrlKey: false,
-				metaKey: true,
 				shiftKey: false,
+				altKey: false,
+				...modifiers,
+			}),
+		);
+	}
+
+	function handleChatGPT(event) {
+		if (!event.isTrusted || event.isComposing) return false;
+		if (event.key !== "Enter") return false;
+
+		// ChatGPT's composer used to be <textarea id="prompt-textarea"> and is now
+		// a ProseMirror contenteditable div without that id, so match the editor
+		// itself instead of relying on the id.
+		const composer = isChatGPTComposer(event.target)
+			? event.target
+			: event.target.closest?.('.ProseMirror[contenteditable="true"]');
+		if (!composer) return false;
+
+		if (event.altKey) return false;
+
+		const isCtrlEnter = event.ctrlKey || event.metaKey;
+		const isShiftEnter = event.shiftKey;
+
+		// Shift+Enter already inserts a newline.
+		if (isShiftEnter && !isCtrlEnter) return false;
+
+		// ChatGPT sends on Enter and sends in the background on Ctrl+Enter, but
+		// its settings page refuses to remap them (the "send comment" shortcut
+		// also uses Ctrl+Enter). Do the remapping ourselves:
+		//   Enter              -> Shift+Enter  (newline)
+		//   Ctrl/Cmd+Enter     -> Enter        (send, switches to the chat)
+		//   Ctrl/Cmd+Shift+Enter -> Ctrl+Enter (send in background)
+		event.preventDefault();
+		event.stopImmediatePropagation();
+
+		if (isCtrlEnter && isShiftEnter) {
+			dispatchChatGPTEnter(composer, {
+				ctrlKey: event.ctrlKey,
+				metaKey: event.metaKey,
 			});
-			event.target.dispatchEvent(newEvent);
-			return true;
-		} else if (event.target.tagName === "TEXTAREA" && isCtrlEnter) {
-			event.preventDefault();
-			const newEvent = new KeyboardEvent("keydown", {
-				key: "Enter",
-				code: "Enter",
-				bubbles: true,
-				cancelable: true,
-				ctrlKey: false,
-				metaKey: true,
-				shiftKey: false,
-			});
-			event.target.dispatchEvent(newEvent);
-			return true;
+		} else if (isCtrlEnter) {
+			dispatchChatGPTEnter(composer, {});
+		} else {
+			dispatchChatGPTEnter(composer, { shiftKey: true });
 		}
 
-		return false;
+		return true;
 	}
 
 	function shouldHandleCtrlEnter(url, search, event) {
