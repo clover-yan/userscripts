@@ -18,6 +18,7 @@ The script logic is inspired by [masachika-kamada/ChatGPT-Ctrl-Enter-Sender](htt
 Platforms marked with \* have been personally tested and confirmed to work.
 
 - [ChatGPT](https://chatgpt.com) \*
+  - Additionally, press `Ctrl+Shift+Enter` (⌘⇧⏎) to send messages to background in ChatGPT.
 - [Claude](https://claude.ai)
 - [Google AI Mode](https://www.google.com?udm=50) \*
 - [Gemini](https://gemini.google.com) \*
