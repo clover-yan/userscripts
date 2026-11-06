@@ -19,7 +19,7 @@
 
 - [ChatGPT](https://chatgpt.com) \*
   - 另外，按 `Ctrl+Shift+Enter`（⌘⇧⏎）可在 ChatGPT 中将消息发送到后台。
-- [Claude](https://claude.ai)
+- [Claude](https://claude.ai) \*
 - [Google AI 模式](https://www.google.com?udm=50) \*
 - [Gemini](https://gemini.google.com) \*
 - [Perplexity](https://www.perplexity.ai)

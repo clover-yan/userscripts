@@ -21,7 +21,7 @@
 
 - [ChatGPT](https://chatgpt.com) \*
   - 另外，按 `Ctrl+Shift+Enter`（⌘⇧⏎）可在 ChatGPT 中將消息送往背景。
-- [Claude](https://claude.ai)
+- [Claude](https://claude.ai) \*
 - [Google AI 模式](https://www.google.com?udm=50) \*
 - [Gemini](https://gemini.google.com) \*
 - [Perplexity](https://www.perplexity.ai)

@@ -19,7 +19,7 @@ Platforms marked with \* have been personally tested and confirmed to work.
 
 - [ChatGPT](https://chatgpt.com) \*
   - Additionally, press `Ctrl+Shift+Enter` (⌘⇧⏎) to send messages to background in ChatGPT.
-- [Claude](https://claude.ai)
+- [Claude](https://claude.ai) \*
 - [Google AI Mode](https://www.google.com?udm=50) \*
 - [Gemini](https://gemini.google.com) \*
 - [Perplexity](https://www.perplexity.ai)

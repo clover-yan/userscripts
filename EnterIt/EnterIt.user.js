@@ -3,7 +3,7 @@
 // @name:zh-CN         EnterIt
 // @name:zh-TW         EnterIt
 // @namespace          http://tampermonkey.net/
-// @version            1.2.5
+// @version            1.2.6
 // @description        Support Enter for new line and Ctrl+Enter to send in various AI assistant web input boxes
 // @description:zh-CN  支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送
 // @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 傳送命運的覺悟。
