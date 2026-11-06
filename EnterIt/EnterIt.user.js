@@ -217,6 +217,16 @@
 		return null;
 	}
 
+	function insertTextareaNewline(textarea) {
+		const start = textarea.selectionStart;
+		const end = textarea.selectionEnd;
+		const value = textarea.value;
+		textarea.value =
+			value.substring(0, start) + "\n" + value.substring(end);
+		textarea.selectionStart = textarea.selectionEnd = start + 1;
+		textarea.dispatchEvent(new Event("input", { bubbles: true }));
+	}
+
 	function handleCustomInputs(event) {
 		const url = window.location.href;
 		const search = window.location.search;
@@ -235,8 +245,49 @@
 			event.key === "Enter" && (event.ctrlKey || event.metaKey);
 
 		if (isOnlyEnter || isCtrlEnter) {
+			// Claude: Enter inserts a newline, Ctrl+Enter sends. Narrow layouts
+			// treat plain Enter as a newline, so send via the button when
+			// possible (same as upstream).
+			if (url.startsWith("https://claude.ai")) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+
+				if (isOnlyEnter) {
+					dispatchEnterEvent(event.target, { shiftKey: true });
+					if (event.target.tagName === "TEXTAREA") {
+						insertTextareaNewline(event.target);
+					}
+				} else if (event.target.tagName === "TEXTAREA") {
+					// Edit mode: no form, and the save button label is localized,
+					// so match the design system's primary fill.
+					const message = event.target.closest(
+						'[data-cds="UserMessage"]',
+					);
+					const saveButton =
+						message &&
+						message.querySelector(
+							"button:not([disabled]):has(> span.bg-fill-primary)",
+						);
+					if (saveButton) {
+						saveButton.click();
+					} else {
+						dispatchEnterEvent(event.target, {});
+					}
+				} else {
+					const sendButton = document.querySelector(
+						'button[data-testid="chat-input-send"]:not([disabled])',
+					);
+					if (sendButton) {
+						sendButton.click();
+					} else {
+						dispatchEnterEvent(event.target, {});
+					}
+				}
+
+				return true;
+			}
+
 			const preventDefaultSites = [
-				"https://claude.ai",
 				"https://www.phind.com",
 				"https://www.perplexity.ai",
 				"https://yuanbao.tencent.com",
@@ -278,27 +329,6 @@
 				const sendButton = findNBLMSendButton();
 				if (sendButton) {
 					sendButton.click();
-				}
-			}
-
-			if (
-				url.startsWith("https://claude.ai") &&
-				event.target.tagName === "TEXTAREA"
-			) {
-				if (isOnlyEnter) {
-					const textarea = event.target;
-					const start = textarea.selectionStart;
-					const end = textarea.selectionEnd;
-					const value = textarea.value;
-					textarea.value =
-						value.substring(0, start) + "\n" + value.substring(end);
-					textarea.selectionStart = textarea.selectionEnd = start + 1;
-					textarea.dispatchEvent(new Event("input", { bubbles: true }));
-				} else if (isCtrlEnter) {
-					const saveButton = document.querySelector('button[type="submit"]');
-					if (saveButton) {
-						saveButton.click();
-					}
 				}
 			}
 
