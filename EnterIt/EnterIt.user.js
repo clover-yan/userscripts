@@ -3,7 +3,7 @@
 // @name:zh-CN         EnterIt
 // @name:zh-TW         EnterIt
 // @namespace          http://tampermonkey.net/
-// @version            1.2.6
+// @version            1.2.7
 // @description        Support Enter for new line and Ctrl+Enter to send in various AI assistant web input boxes
 // @description:zh-CN  支持在各种 AI 助手网页端输入框按回车换行，Ctrl+回车发送
 // @description:zh-TW  支援在各種 AI 助手網頁端輸入框，以 Enter 譜寫換行的詩篇，以 Ctrl+Enter 傳送命運的覺悟。
@@ -139,6 +139,36 @@
 		if (!event.ctrlKey) return false;
 		event.preventDefault();
 		dispatchEnterEvent(target, { metaKey: true });
+		return true;
+	}
+
+	// Doubao's composer is a tiptap ProseMirror contenteditable div, not a
+	// textarea, and it ignores synthetic keydown events for sending, so
+	// Ctrl+Enter has to click the send button.
+	function handleDoubao(event) {
+		if (!event.isTrusted || event.isComposing) return false;
+		if (event.key !== "Enter") return false;
+
+		const editor = event.target.closest?.(".tiptap.ProseMirror");
+		if (!editor || editor.contentEditable !== "true") return false;
+
+		if (event.ctrlKey || event.metaKey) {
+			const sendButton = document.querySelector(
+				'button[data-testid="chat_input_send_button"]:not([disabled])',
+			);
+			if (!sendButton) return false;
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			sendButton.click();
+			return true;
+		}
+
+		// Shift+Enter already inserts a newline.
+		if (event.shiftKey) return false;
+
+		event.preventDefault();
+		event.stopImmediatePropagation();
+		dispatchEnterEvent(editor, { shiftKey: true });
 		return true;
 	}
 
@@ -291,6 +321,7 @@
 				"https://www.phind.com",
 				"https://www.perplexity.ai",
 				"https://yuanbao.tencent.com",
+				"https://www.qianwen.com",
 			];
 			if (preventDefaultSites.some((site) => url.startsWith(site))) {
 				event.preventDefault();
@@ -411,6 +442,8 @@
 			url.startsWith("https://yiyan.baidu.com")
 		) {
 			if (handleCustomInputs(event)) return;
+		} else if (url.startsWith("https://www.doubao.com")) {
+			if (handleDoubao(event) || handleTextarea(event)) return;
 		} else if (
 			(url.startsWith("https://www.google.com") &&
 				new URLSearchParams(search).get("udm") === "50") ||
@@ -419,7 +452,6 @@
 			url.startsWith("https://you.com") ||
 			url.startsWith("https://v0.dev") ||
 			url.startsWith("https://copilot.microsoft.com") ||
-			url.startsWith("https://www.doubao.com") ||
 			url.startsWith("https://chat.qwen.ai")
 		) {
 			if (handleTextarea(event)) return;
